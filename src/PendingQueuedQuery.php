@@ -5,6 +5,7 @@ namespace QueueSql;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use QueueSql\Jobs\DeleteRangeJob;
+use QueueSql\Jobs\UpdateRangeJob;
 
 class PendingQueuedQuery
 {
@@ -41,6 +42,28 @@ class PendingQueuedQuery
             jobs: $jobs,
             config: $this->config,
             operation: 'delete',
+            countProbe: fn () => (clone $builder)->count(),
+        );
+    }
+
+    public function update(array $values): QueuedOperation
+    {
+        $snapshot = QuerySnapshot::capture($this->builder);
+        $key = $snapshot->keyName();
+        $builder = $this->builder;
+        $ranges = (new RangePlanner($builder, $key))->plan($this->config->chunk);
+
+        $tries = $this->config->tries;
+        $jobs = array_map(function (array $range) use ($snapshot, $key, $values, $tries) {
+            $job = new UpdateRangeJob($snapshot, $range, $key, $values);
+            $job->tries = $tries;
+            return $job;
+        }, $ranges);
+
+        return new QueuedOperation(
+            jobs: $jobs,
+            config: $this->config,
+            operation: 'update',
             countProbe: fn () => (clone $builder)->count(),
         );
     }

@@ -5,6 +5,7 @@ namespace QueueSql;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use QueueSql\Jobs\DeleteRangeJob;
+use QueueSql\Jobs\InsertChunkJob;
 use QueueSql\Jobs\UpdateRangeJob;
 
 class PendingQueuedQuery
@@ -65,6 +66,37 @@ class PendingQueuedQuery
             config: $this->config,
             operation: 'update',
             countProbe: fn () => (clone $builder)->count(),
+        );
+    }
+
+    public function insert(array $rows): QueuedOperation
+    {
+        $builder = $this->builder;
+
+        if ($builder instanceof EloquentBuilder) {
+            $model = get_class($builder->getModel());
+            $connection = $builder->getModel()->getConnectionName();
+            $table = null;
+        } else {
+            $model = null;
+            $connection = $builder->getConnection()->getName();
+            $table = $builder->from;
+        }
+
+        $parts = array_chunk($rows, max($this->config->chunk, 1));
+
+        $tries = $this->config->tries;
+        $jobs = array_map(function (array $part) use ($model, $connection, $table, $tries) {
+            $job = new InsertChunkJob($model, $connection, $table, $part);
+            $job->tries = $tries;
+            return $job;
+        }, $parts);
+
+        return new QueuedOperation(
+            jobs: $jobs,
+            config: $this->config,
+            operation: 'insert',
+            countProbe: fn () => count($rows),
         );
     }
 }

@@ -1,4 +1,11 @@
-# queue-sql
+<p align="center"><img width="360" src="art/logo.svg" alt="queue-sql"></p>
+
+<p align="center">
+<a href="https://github.com/kamranata/queue-sql/actions"><img src="https://github.com/kamranata/queue-sql/actions/workflows/tests.yml/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/atayevkamran/queue-sql"><img src="https://img.shields.io/packagist/dt/atayevkamran/queue-sql" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/atayevkamran/queue-sql"><img src="https://img.shields.io/packagist/v/atayevkamran/queue-sql" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/atayevkamran/queue-sql"><img src="https://img.shields.io/packagist/l/atayevkamran/queue-sql" alt="License"></a>
+</p>
 
 Queue any Laravel write query — `delete`, `update`, `insert` — and run it across
 parallel batched jobs. Built for large-scale mutations without long locks.

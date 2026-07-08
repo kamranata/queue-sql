@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="queue-sql icon">
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="#F2F3F3"/>
+
+  <!-- motion dashes -->
+  <g fill="#2A9D8F">
+    <circle cx="118" cy="238" r="9"/>
+    <rect x="96" y="278" width="70" height="18" rx="9"/>
+    <circle cx="118" cy="330" r="9"/>
+    <rect x="112" y="318" width="58" height="18" rx="9" fill="#57B6AA"/>
+    <rect x="120" y="238" width="48" height="18" rx="9" fill="#57B6AA"/>
+  </g>
+
+  <!-- database cylinder -->
+  <g>
+    <path d="M118 168 V336 a94 30 0 0 0 188 0 V168 Z" fill="#123B63"/>
+    <ellipse cx="212" cy="168" rx="94" ry="30" fill="#1C4E7E"/>
+    <path d="M118 228 a94 30 0 0 0 188 0" fill="none" stroke="#F2F3F3" stroke-width="9"/>
+    <path d="M118 288 a94 30 0 0 0 188 0" fill="none" stroke="#F2F3F3" stroke-width="9"/>
+  </g>
+
+  <!-- magnifier / Q -->
+  <g>
+    <circle cx="312" cy="308" r="70" fill="#F2F3F3"/>
+    <circle cx="312" cy="308" r="70" fill="none" stroke="#123B63" stroke-width="24"/>
+    <path d="M356 352 L404 400" stroke="#123B63" stroke-width="30" stroke-linecap="round"/>
+    <!-- query rows -->
+    <g fill="#2A9D8F">
+      <rect x="284" y="286" width="60" height="15" rx="7.5"/>
+      <rect x="278" y="300" width="72" height="15" rx="7.5"/>
+      <rect x="284" y="314" width="60" height="15" rx="7.5"/>
+    </g>
+  </g>
+
+  <!-- throughput arrows -->
+  <g stroke="#2A9D8F" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M398 262 h44 m-16 -16 l16 16 l-16 16"/>
+    <path d="M406 308 h44 m-16 -16 l16 16 l-16 16"/>
+    <path d="M398 354 h44 m-16 -16 l16 16 l-16 16"/>
+  </g>
+</svg>

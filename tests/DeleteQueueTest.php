@@ -22,7 +22,7 @@ class DeleteQueueTest extends TestCase
         $this->seedRows(10); // ids 1..10
         Bus::fake();
 
-        User::where('is_blocked', true)->queue(chunk: 4)->delete();
+        User::where('is_blocked', true)->queue(chunk: 4)->delete()->dispatch();
 
         Bus::assertBatched(fn ($batch) => $batch->jobs->count() === 3);
     }
@@ -33,7 +33,7 @@ class DeleteQueueTest extends TestCase
 
         // Run jobs synchronously.
         config()->set('queue.default', 'sync');
-        User::where('is_blocked', true)->queue(chunk: 4)->delete();
+        User::where('is_blocked', true)->queue(chunk: 4)->delete()->dispatch();
 
         $this->assertSame(5, User::count());
         $this->assertSame(0, User::where('is_blocked', true)->count());

@@ -33,9 +33,11 @@ class PendingQueuedQuery
         $ranges = $this->buildRanges($snapshot, $key);
 
         $tries = $this->config->tries;
-        $jobs = array_map(function (?array $range) use ($snapshot, $key, $tries) {
+        $backoff = $this->config->backoff;
+        $jobs = array_map(function (?array $range) use ($snapshot, $key, $tries, $backoff) {
             $job = new DeleteRangeJob($snapshot, $range, $key);
             $job->tries = $tries;
+            $job->backoff = $backoff;
             return $job;
         }, $ranges);
 
@@ -55,9 +57,11 @@ class PendingQueuedQuery
         $ranges = $this->buildRanges($snapshot, $key);
 
         $tries = $this->config->tries;
-        $jobs = array_map(function (?array $range) use ($snapshot, $key, $values, $tries) {
+        $backoff = $this->config->backoff;
+        $jobs = array_map(function (?array $range) use ($snapshot, $key, $values, $tries, $backoff) {
             $job = new UpdateRangeJob($snapshot, $range, $key, $values);
             $job->tries = $tries;
+            $job->backoff = $backoff;
             return $job;
         }, $ranges);
 
@@ -86,9 +90,11 @@ class PendingQueuedQuery
         $parts = array_chunk($rows, max($this->config->chunk, 1));
 
         $tries = $this->config->tries;
-        $jobs = array_map(function (array $part) use ($model, $connection, $table, $tries) {
+        $backoff = $this->config->backoff;
+        $jobs = array_map(function (array $part) use ($model, $connection, $table, $tries, $backoff) {
             $job = new InsertChunkJob($model, $connection, $table, $part);
             $job->tries = $tries;
+            $job->backoff = $backoff;
             return $job;
         }, $parts);
 

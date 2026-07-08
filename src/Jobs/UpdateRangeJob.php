@@ -16,6 +16,9 @@ class UpdateRangeJob implements ShouldQueue
     /** Retry attempts; a public property is how the queue worker reads tries. */
     public ?int $tries = null;
 
+    /** Seconds (or array of seconds) to wait between retries; read by the queue worker. */
+    public int|array|null $backoff = null;
+
     public function __construct(
         public QuerySnapshot $snapshot,
         public ?array $range,

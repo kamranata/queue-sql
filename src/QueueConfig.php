@@ -12,7 +12,6 @@ class QueueConfig
         public readonly ?string $onQueue,
         public readonly ?int $throttle,
         public readonly ?int $delay,
-        public readonly bool $dryRun,
     ) {}
 
     public static function make(
@@ -23,7 +22,6 @@ class QueueConfig
         ?string $onQueue = null,
         ?int $throttle = null,
         ?int $delay = null,
-        bool $dryRun = false,
     ): self {
         return new self(
             chunk: $chunk ?? (int) config('queue-sql.chunk', 1000),
@@ -33,7 +31,6 @@ class QueueConfig
             onQueue: $onQueue ?? config('queue-sql.queue'),
             throttle: $throttle,
             delay: $delay,
-            dryRun: $dryRun,
         );
     }
 }

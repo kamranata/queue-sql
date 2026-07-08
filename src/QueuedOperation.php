@@ -52,7 +52,17 @@ class QueuedOperation
         if ($this->catchCb)   { $batch->catch($this->catchCb); }
         if ($this->finallyCb) { $batch->finally($this->finallyCb); }
 
-        return $batch->dispatch();
+        $dispatched = $batch->dispatch();
+
+        // Laravel never fires batch completion callbacks for a zero-job batch,
+        // so invoke them inline here to honor the then()/finally() contract.
+        // (No catch: an empty operation cannot fail.)
+        if ($this->jobs === []) {
+            if ($this->thenCb)    { ($this->thenCb)($dispatched); }
+            if ($this->finallyCb) { ($this->finallyCb)($dispatched); }
+        }
+
+        return $dispatched;
     }
 
     public function dryRun(): array

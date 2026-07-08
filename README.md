@@ -49,7 +49,6 @@ DB::table('imports')->queue(chunk: 1000)->insert($millionRows)->dispatch();
 | `onQueue` | queue name | default |
 | `throttle` | max jobs/second | none |
 | `delay` | seconds before jobs start | none |
-| `dryRun` | build plan without dispatch | `false` |
 
 ## Limitations (v1)
 
@@ -59,6 +58,10 @@ DB::table('imports')->queue(chunk: 1000)->insert($millionRows)->dispatch();
   `whereExists`, sub-selects) are supported.
 - **`insert` is not idempotent** — a retry can duplicate rows. Guard with unique
   indexes / `insertOrIgnore` at the DB level.
+- **Throttle/delay staggering relies on the queue driver honoring per-job delay** —
+  the database and redis drivers do; SQS caps delay at 15 minutes.
+- **Fan-out plans the primary-key range at dispatch time** — rows inserted afterward
+  with a key above the captured max are not processed by that run.
 
 ## Requirements
 

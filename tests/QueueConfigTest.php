@@ -11,7 +11,6 @@ class QueueConfigTest extends TestCase
         $c = QueueConfig::make();
         $this->assertSame(1000, $c->chunk);
         $this->assertSame(1, $c->tries);
-        $this->assertFalse($c->dryRun);
     }
 
     public function test_named_overrides_win(): void

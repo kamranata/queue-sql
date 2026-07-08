@@ -27,13 +27,12 @@ class QueueSqlServiceProvider extends ServiceProvider
             ?string $onQueue = null,
             ?int $throttle = null,
             ?int $delay = null,
-            bool $dryRun = false,
         ) {
             /** @var EloquentBuilder|QueryBuilder $this */
             return new PendingQueuedQuery($this, QueueConfig::make(
                 chunk: $chunk, tries: $tries, backoff: $backoff,
                 onConnection: $onConnection, onQueue: $onQueue,
-                throttle: $throttle, delay: $delay, dryRun: $dryRun,
+                throttle: $throttle, delay: $delay,
             ));
         };
 

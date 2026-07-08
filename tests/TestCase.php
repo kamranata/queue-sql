@@ -30,6 +30,10 @@ class TestCase extends Orchestra
             $t->string('name')->nullable();
             $t->boolean('is_blocked')->default(false);
         });
+        $this->app['db']->connection()->getSchemaBuilder()->create('tokens', function ($t) {
+            $t->string('uuid')->primary();
+            $t->boolean('revoked')->default(false);
+        });
         // job_batches table required by Bus::batch
         $this->artisan('queue:batches-table');
         $this->artisan('migrate');

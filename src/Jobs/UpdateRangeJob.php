@@ -18,7 +18,7 @@ class UpdateRangeJob implements ShouldQueue
 
     public function __construct(
         public QuerySnapshot $snapshot,
-        public array $range,
+        public ?array $range,
         public string $keyName,
         public array $values,
     ) {}
@@ -29,10 +29,13 @@ class UpdateRangeJob implements ShouldQueue
             return;
         }
 
-        [$start, $end] = $this->range;
+        $query = $this->snapshot->restore();
 
-        $this->snapshot->restore()
-            ->whereBetween($this->keyName, [$start, $end])
-            ->update($this->values);
+        if ($this->range !== null) {
+            [$start, $end] = $this->range;
+            $query->whereBetween($this->keyName, [$start, $end]);
+        }
+
+        $query->update($this->values);
     }
 }

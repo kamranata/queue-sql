@@ -18,7 +18,7 @@ class DeleteRangeJob implements ShouldQueue
 
     public function __construct(
         public QuerySnapshot $snapshot,
-        public array $range,
+        public ?array $range,
         public string $keyName,
     ) {}
 
@@ -28,10 +28,13 @@ class DeleteRangeJob implements ShouldQueue
             return;
         }
 
-        [$start, $end] = $this->range;
+        $query = $this->snapshot->restore();
 
-        $this->snapshot->restore()
-            ->whereBetween($this->keyName, [$start, $end])
-            ->delete();
+        if ($this->range !== null) {
+            [$start, $end] = $this->range;
+            $query->whereBetween($this->keyName, [$start, $end]);
+        }
+
+        $query->delete();
     }
 }

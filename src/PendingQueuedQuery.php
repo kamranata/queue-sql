@@ -30,10 +30,10 @@ class PendingQueuedQuery
         $snapshot = QuerySnapshot::capture($this->builder);
         $key = $snapshot->keyName();
         $builder = $this->builder;
-        $ranges = (new RangePlanner($builder, $key))->plan($this->config->chunk);
+        $ranges = $this->buildRanges($snapshot, $key);
 
         $tries = $this->config->tries;
-        $jobs = array_map(function (array $range) use ($snapshot, $key, $tries) {
+        $jobs = array_map(function (?array $range) use ($snapshot, $key, $tries) {
             $job = new DeleteRangeJob($snapshot, $range, $key);
             $job->tries = $tries;
             return $job;
@@ -52,10 +52,10 @@ class PendingQueuedQuery
         $snapshot = QuerySnapshot::capture($this->builder);
         $key = $snapshot->keyName();
         $builder = $this->builder;
-        $ranges = (new RangePlanner($builder, $key))->plan($this->config->chunk);
+        $ranges = $this->buildRanges($snapshot, $key);
 
         $tries = $this->config->tries;
-        $jobs = array_map(function (array $range) use ($snapshot, $key, $values, $tries) {
+        $jobs = array_map(function (?array $range) use ($snapshot, $key, $values, $tries) {
             $job = new UpdateRangeJob($snapshot, $range, $key, $values);
             $job->tries = $tries;
             return $job;
@@ -98,5 +98,14 @@ class PendingQueuedQuery
             operation: 'insert',
             countProbe: fn () => count($rows),
         );
+    }
+
+    private function buildRanges(QuerySnapshot $snapshot, string $key): array
+    {
+        if (! $snapshot->canFanOut()) {
+            return [null]; // single job, no whereBetween
+        }
+
+        return (new RangePlanner($this->builder, $key))->plan($this->config->chunk) ?: [];
     }
 }

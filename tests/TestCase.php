@@ -20,6 +20,7 @@ class TestCase extends Orchestra
             'database' => ':memory:',
             'prefix' => '',
         ]);
+        $app['config']->set('queue.batching.database', 'testing');
     }
 
     protected function defineDatabaseMigrations(): void

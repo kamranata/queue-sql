@@ -2,9 +2,9 @@
 
 <p align="center">
 <a href="https://github.com/kamranata/queue-sql/actions"><img src="https://github.com/kamranata/queue-sql/actions/workflows/tests.yml/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/atayevkamran/queue-sql"><img src="https://img.shields.io/packagist/dt/atayevkamran/queue-sql" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/atayevkamran/queue-sql"><img src="https://img.shields.io/packagist/v/atayevkamran/queue-sql" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/atayevkamran/queue-sql"><img src="https://img.shields.io/packagist/l/atayevkamran/queue-sql" alt="License"></a>
+<a href="https://packagist.org/packages/kamranata/queue-sql"><img src="https://img.shields.io/packagist/dt/kamranata/queue-sql" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/kamranata/queue-sql"><img src="https://img.shields.io/packagist/v/kamranata/queue-sql" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/kamranata/queue-sql"><img src="https://img.shields.io/packagist/l/kamranata/queue-sql" alt="License"></a>
 </p>
 
 Queue any Laravel write query — `delete`, `update`, `insert` — and run it across
@@ -13,7 +13,7 @@ parallel batched jobs. Built for large-scale mutations without long locks.
 ## Install
 
 ```bash
-composer require atayevkamran/queue-sql
+composer require kamranata/queue-sql
 php artisan queue:batches-table   # required: job_batches table
 php artisan migrate
 php artisan vendor:publish --tag=queue-sql-config   # optional

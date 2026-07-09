@@ -1,5 +1,5 @@
 {
-    "name": "atayevkamran/queue-sql",
+    "name": "kamranata/queue-sql",
     "description": "Queue any Laravel write query (delete/update/insert) across parallel batched jobs.",
     "license": "MIT",
     "require": {

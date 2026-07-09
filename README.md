@@ -1,4 +1,4 @@
-<p align="center"><img width="360" src="art/logo.svg" alt="queue-sql"></p>
+<p align="center"><img width="420" src="art/logo.png" alt="queue-sql"></p>
 
 <p align="center">
 <a href="https://github.com/kamranata/queue-sql/actions"><img src="https://github.com/kamranata/queue-sql/actions/workflows/tests.yml/badge.svg" alt="Build Status"></a>

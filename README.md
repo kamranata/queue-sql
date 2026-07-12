@@ -10,6 +10,34 @@
 Queue any Laravel write query — `delete`, `update`, `insert` — and run it across
 parallel batched jobs. Built for large-scale mutations without long locks.
 
+## Why
+
+A single `User::where('is_blocked', true)->delete()` over millions of rows runs one giant
+statement: it holds a long lock, blocks the web request, strains replication, and often hits
+the request or worker timeout.
+
+`queue-sql` turns that one statement into many small, parallel jobs. It reads the min/max
+primary key under your constraints, splits the key space into `chunk`-sized ranges, and
+dispatches one batched job per range. Each job re-applies your original `WHERE` and mutates
+only its own slice — so every statement is small and bounded, locks stay short, and the work
+runs on your queue workers instead of the request.
+
+You keep the fluent Eloquent API you already know, and get batch progress, retries, throttling,
+and `then`/`catch`/`finally` callbacks for free.
+
+## How it works
+
+```
+queue() macro  →  capture WHERE as a portable SQL fragment  →  plan PK ranges
+              →  one batched job per range  →  Bus::batch (parallel workers)
+```
+
+- Constraints are captured as a compiled SQL fragment plus bindings, so **every** `where` type
+  — flat, nested closures, `whereHas`, `whereExists`, sub-selects — survives the queue boundary
+  and stays fully parameterized (injection-safe).
+- Delete/update by primary-key range are **idempotent**, so a retried job is safe.
+- No single incrementing integer key? The operation falls back to one job (still queued).
+
 ## Install
 
 ```bash

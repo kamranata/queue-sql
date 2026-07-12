@@ -6,6 +6,12 @@ All notable changes to `queue-sql` are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- Batch names now carry the target table: `queue-sql:{operation}:{table}` (e.g.
+  `queue-sql:delete:users`) instead of the bare `queue-sql:delete`, so batches are
+  distinguishable in `job_batches` / Horizon.
+- `dryRun()` now reports the resolved `table` alongside `operation`.
+
 ## [1.0.0] - 2026-07-08
 
 ### Added

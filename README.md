@@ -61,7 +61,7 @@ User::where('is_blocked', true)
 
 // Preview without dispatching:
 User::where('is_blocked', true)->queue(chunk: 5000)->delete()->dryRun();
-// => ['operation' => 'delete', 'jobs' => 40, 'ranges' => 40, 'estimatedRows' => 190234]
+// => ['operation' => 'delete', 'table' => 'users', 'jobs' => 40, 'ranges' => 40, 'estimatedRows' => 190234]
 
 // Update:
 User::where('last_login', '<', now()->subYear())
@@ -71,6 +71,15 @@ User::where('last_login', '<', now()->subYear())
 
 // Insert (fans out over the row array):
 DB::table('imports')->queue(chunk: 1000)->insert($millionRows)->dispatch();
+```
+
+Each dispatch returns Laravel's `Illuminate\Bus\Batch`, and its batch is named
+`queue-sql:{operation}:{table}` — e.g. `queue-sql:delete:users` — so runs are easy to
+find and filter in `job_batches` or Horizon:
+
+```php
+$batch = User::where('is_blocked', true)->queue(chunk: 5000)->delete()->dispatch();
+$batch->id; // persist this to check progress / cancel later
 ```
 
 ## Parameters (`queue(...)`)

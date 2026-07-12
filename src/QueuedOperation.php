@@ -17,6 +17,7 @@ class QueuedOperation
         private QueueConfig $config,
         private string $operation,
         private $countProbe = null,
+        private ?string $table = null,
     ) {}
 
     public function then(callable $cb): self { $this->thenCb = $cb; return $this; }
@@ -33,8 +34,11 @@ class QueuedOperation
     {
         $this->applyThrottle();
 
+        $name = 'queue-sql:' . $this->operation
+            . ($this->table !== null ? ':' . $this->table : '');
+
         $batch = Bus::batch($this->jobs)
-            ->name('queue-sql:' . $this->operation);
+            ->name($name);
 
         // PendingBatch::onConnection()/onQueue() reject null in Laravel 13; a null
         // config value means "use the default", so only set them when non-null.
@@ -69,6 +73,7 @@ class QueuedOperation
     {
         return [
             'operation' => $this->operation,
+            'table' => $this->table,
             'jobs' => count($this->jobs),
             'ranges' => count($this->jobs),
             'estimatedRows' => $this->countProbe ? (int) ($this->countProbe)() : null,

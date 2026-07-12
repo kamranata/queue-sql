@@ -46,6 +46,7 @@ class PendingQueuedQuery
             config: $this->config,
             operation: 'delete',
             countProbe: fn () => (clone $builder)->count(),
+            table: $snapshot->tableName(),
         );
     }
 
@@ -70,6 +71,7 @@ class PendingQueuedQuery
             config: $this->config,
             operation: 'update',
             countProbe: fn () => (clone $builder)->count(),
+            table: $snapshot->tableName(),
         );
     }
 
@@ -81,10 +83,12 @@ class PendingQueuedQuery
             $model = get_class($builder->getModel());
             $connection = $builder->getModel()->getConnectionName();
             $table = null;
+            $tableName = $builder->getModel()->getTable();
         } else {
             $model = null;
             $connection = $builder->getConnection()->getName();
             $table = $builder->from;
+            $tableName = $table;
         }
 
         $parts = array_chunk($rows, max($this->config->chunk, 1));
@@ -103,6 +107,7 @@ class PendingQueuedQuery
             config: $this->config,
             operation: 'insert',
             countProbe: fn () => count($rows),
+            table: $tableName,
         );
     }
 

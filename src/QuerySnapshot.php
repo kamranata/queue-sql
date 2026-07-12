@@ -37,7 +37,7 @@ class QuerySnapshot
             return new self(
                 model: get_class($model),
                 connection: $query->getConnection()->getName(),
-                table: null,
+                table: $model->getTable(),
                 whereSql: $whereSql,
                 bindings: array_values($bindings),
                 keyName: is_array($key) ? '' : $key,
@@ -75,6 +75,11 @@ class QuerySnapshot
     public function keyName(): string
     {
         return $this->keyName;
+    }
+
+    public function tableName(): ?string
+    {
+        return $this->table;
     }
 
     public function canFanOut(): bool

@@ -6,6 +6,11 @@ All notable changes to `queue-sql` are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- Artisan commands: `queue-sql:status` (list all queue-sql batches, or show one by id with
+  live progress) and `queue-sql:cancel {batch}` (cancel a running batch). Status surfaces
+  Laravel's native batch progress — no extra tracking state is stored.
+
 ## [1.2.0] - 2026-07-13
 
 ### Added

@@ -82,6 +82,17 @@ $batch = User::where('is_blocked', true)->queue(chunk: 5000)->delete()->dispatch
 $batch->id; // persist this to check progress / cancel later
 ```
 
+## Monitoring (Artisan)
+
+```bash
+php artisan queue-sql:status            # list every queue-sql batch (id, name, progress)
+php artisan queue-sql:status {batch}    # one batch: total/pending/failed, progress %, state
+php artisan queue-sql:cancel {batch}    # cancel a running batch
+```
+
+Progress comes straight from Laravel's batch record — no extra tracking is stored. Grab a
+batch id from `->dispatch()` (`$batch->id`) or from the `queue-sql:status` list.
+
 ## Parameters (`queue(...)`)
 
 | Param | Meaning | Default |

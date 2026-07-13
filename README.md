@@ -23,7 +23,20 @@ only its own slice — so every statement is small and bounded, locks stay short
 runs on your queue workers instead of the request.
 
 You keep the fluent Eloquent API you already know, and get batch progress, retries, throttling,
-and `then`/`catch`/`finally` callbacks for free.
+`then`/`catch`/`finally` callbacks, Artisan monitoring, and Horizon tags for free.
+
+## Features
+
+- **Any write, any builder** — `delete` / `update` / `insert` on the Query Builder or Eloquent.
+- **Parallel PK-range fan-out** — one batched job per key range; short locks instead of one long one.
+- **Every `where` survives the queue boundary** — nested closures, `whereHas`, `whereExists`,
+  sub-selects — captured as a parameterized SQL fragment (injection-safe, no serialized closures).
+- **Size by rows or by jobs** — fixed `chunk`, or `maxJobs` to cap the total job count.
+- **Config-driven defaults** — set `chunk` / `tries` / `backoff` / `throttle` / `delay` / queue
+  routing once in `config/queue-sql.php`.
+- **Operate from the CLI** — `queue-sql:status` and `queue-sql:cancel`, plus Horizon tags.
+- **Preview first** — `dryRun()` reports the plan without dispatching.
+- **Tested on SQLite, MySQL, and Postgres** across Laravel 10–13 / PHP 8.1+.
 
 ## How it works
 
@@ -166,7 +179,7 @@ longest lock under queue-sql. On MySQL or Postgres with millions of rows and rea
 contention the gap is far larger — point the script at your database with
 `DB_CONNECTION=mysql …` to see your own numbers.
 
-## Limitations (v1)
+## Limitations
 
 - **Reads are not supported** — write operations only.
 - **Fan-out needs an incrementing integer primary key.** Other keys fall back to a
@@ -181,4 +194,4 @@ contention the gap is far larger — point the script at your database with
 
 ## Requirements
 
-Laravel 10–13, PHP 8.1+.
+Laravel 10–13, PHP 8.1+. The suite runs against SQLite, MySQL, and Postgres in CI.

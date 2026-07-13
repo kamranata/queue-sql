@@ -6,6 +6,12 @@ All notable changes to `queue-sql` are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- `queue(maxJobs: N)` — dynamic chunk sizing. Instead of a fixed `chunk`, the fan-out is sized
+  so it produces at most `N` jobs (`chunk = ceil(keySpan / N)` for range fan-out, or
+  `ceil(rowCount / N)` for `insert`). Opt-in, has no config default, and is mutually exclusive
+  with `chunk` — passing both throws `InvalidArgumentException`.
+
 ## [1.1.0] - 2026-07-13
 
 ### Added

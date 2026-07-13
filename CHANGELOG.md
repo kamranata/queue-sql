@@ -7,6 +7,9 @@ All notable changes to `queue-sql` are documented here. The format is based on
 ## [Unreleased]
 
 ### Added
+- Config-driven defaults for **all** `queue(...)` params. `config/queue-sql.php` now also
+  supplies `tries`, `backoff`, `throttle`, and `delay` (in addition to `chunk`, `connection`,
+  `queue`). Precedence per param: explicit `queue(...)` arg > config default > built-in fallback.
 - Batch names now carry the target table: `queue-sql:{operation}:{table}` (e.g.
   `queue-sql:delete:users`) instead of the bare `queue-sql:delete`, so batches are
   distinguishable in `job_batches` / Horizon.

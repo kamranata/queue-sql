@@ -94,6 +94,27 @@ $batch->id; // persist this to check progress / cancel later
 | `throttle` | max jobs/second | none |
 | `delay` | seconds before jobs start | none |
 
+Every param resolves in this order: **explicit `queue(...)` argument → `config/queue-sql.php`
+default → built-in fallback** (the *Default* column above). Publish the config to set your own
+defaults once, globally:
+
+```php
+// config/queue-sql.php
+return [
+    'chunk' => 1000,
+    'tries' => 1,
+    'backoff' => 0,
+    'connection' => null,   // null = Laravel's default connection
+    'queue' => null,        // null = default queue name
+    'throttle' => null,     // null = no throttle
+    'delay' => null,        // null = no delay
+];
+```
+
+Note: because a `null` argument means "fall back to config", you cannot pass `throttle: null`
+at the call site to *disable* a throttle configured globally — set `throttle: 0`-style opt-outs
+are not supported for it. `delay: 0` does work as an explicit per-call override.
+
 ## Benchmark
 
 A plain mass delete runs one statement that holds a lock for its entire duration; queue-sql

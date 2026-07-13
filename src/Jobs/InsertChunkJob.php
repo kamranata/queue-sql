@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class InsertChunkJob implements ShouldQueue
 {
-    use Batchable, Dispatchable, InteractsWithQueue, Queueable;
+    use Batchable, Dispatchable, HasQueueSqlTags, InteractsWithQueue, Queueable;
 
     /** Retry attempts; a public property is how the queue worker reads tries. */
     public ?int $tries = null;
@@ -38,5 +38,12 @@ class InsertChunkJob implements ShouldQueue
         }
 
         DB::connection($this->connectionName)->table($this->table)->insert($this->rows);
+    }
+
+    public function tags(): array
+    {
+        $table = $this->table ?? ($this->model !== null ? (new $this->model)->getTable() : null);
+
+        return $this->queueSqlTags('insert', $table);
     }
 }

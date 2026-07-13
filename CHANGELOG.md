@@ -6,6 +6,10 @@ All notable changes to `queue-sql` are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- Horizon tags on every job — `queue-sql`, `queue-sql:{operation}`, and
+  `queue-sql:{operation}:{table}` — so runs group and filter in the Horizon dashboard.
+
 ## [1.2.0] - 2026-07-13
 
 ### Added

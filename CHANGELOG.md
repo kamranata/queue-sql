@@ -6,6 +6,8 @@ All notable changes to `queue-sql` are documented here. The format is based on
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-13
+
 ### Added
 - `queue(maxJobs: N)` — dynamic chunk sizing. Instead of a fixed `chunk`, the fan-out is sized
   so it produces at most `N` jobs (`chunk = ceil(keySpan / N)` for range fan-out, or
@@ -45,6 +47,7 @@ All notable changes to `queue-sql` are documented here. The format is based on
   no-dispatch plan preview.
 - Support for Laravel 10, 11, 12, and 13 on PHP 8.1+.
 
-[Unreleased]: https://github.com/kamranata/queue-sql/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/kamranata/queue-sql/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/kamranata/queue-sql/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/kamranata/queue-sql/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/kamranata/queue-sql/releases/tag/v1.0.0

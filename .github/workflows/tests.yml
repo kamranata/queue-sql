@@ -29,3 +29,50 @@ jobs:
       - run: composer require "illuminate/support:${{ matrix.laravel }}" --no-update
       - run: composer update --prefer-dist --no-interaction
       - run: vendor/bin/phpunit
+
+  # Driver behavior (MIN/MAX, whereBetween boundaries, grammar) is engine-specific,
+  # not PHP/Laravel-specific — so run the full suite once per engine on a single
+  # representative PHP+Laravel combo instead of expanding the matrix above.
+  cross-database:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        db: ['pgsql', 'mysql']
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: queue_sql_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s --health-timeout 5s --health-retries 5
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_DATABASE: queue_sql_test
+          MYSQL_ROOT_PASSWORD: root
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      DB_CONNECTION: ${{ matrix.db }}
+      DB_HOST: 127.0.0.1
+      DB_DATABASE: queue_sql_test
+      DB_PORT: ${{ matrix.db == 'pgsql' && '5432' || '3306' }}
+      DB_USERNAME: ${{ matrix.db == 'pgsql' && 'postgres' || 'root' }}
+      DB_PASSWORD: ${{ matrix.db == 'pgsql' && 'postgres' || 'root' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo, pdo_pgsql, pdo_mysql
+          coverage: none
+      - run: composer require "illuminate/support:^13.0" --no-update
+      - run: composer update --prefer-dist --no-interaction
+      - run: vendor/bin/phpunit

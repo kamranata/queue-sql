@@ -21,7 +21,17 @@ vendor/bin/phpunit
 ```
 
 Tests run on an in-memory SQLite database via Orchestra Testbench — no external services
-required.
+required. To reproduce the CI cross-database checks locally, point the suite at a real engine
+with env vars (driver behavior such as `MIN/MAX` and `whereBetween` boundaries is
+engine-specific):
+
+```bash
+DB_CONNECTION=pgsql DB_HOST=127.0.0.1 DB_PORT=5432 \
+DB_DATABASE=queue_sql_test DB_USERNAME=postgres DB_PASSWORD=postgres vendor/bin/phpunit
+
+DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3306 \
+DB_DATABASE=queue_sql_test DB_USERNAME=root DB_PASSWORD=root vendor/bin/phpunit
+```
 
 ## Pull requests
 
@@ -36,8 +46,9 @@ required.
 
 ## Supported versions
 
-The CI matrix runs the suite against Laravel 10, 11, 12, and 13 across PHP 8.1–8.4. A change
-must pass on every supported combination.
+The CI matrix runs the suite against Laravel 10, 11, 12, and 13 across PHP 8.1–8.4. A separate
+`cross-database` job also runs the suite against real Postgres and MySQL. A change must pass on
+every supported combination.
 
 ## Coding conventions
 

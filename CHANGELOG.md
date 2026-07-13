@@ -7,6 +7,9 @@ All notable changes to `queue-sql` are documented here. The format is based on
 ## [Unreleased]
 
 ### Added
+- Artisan commands: `queue-sql:status` (list all queue-sql batches, or show one by id with
+  live progress) and `queue-sql:cancel {batch}` (cancel a running batch). Status surfaces
+  Laravel's native batch progress — no extra tracking state is stored.
 - Horizon tags on every job — `queue-sql`, `queue-sql:{operation}`, and
   `queue-sql:{operation}:{table}` — so runs group and filter in the Horizon dashboard.
 

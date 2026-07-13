@@ -85,6 +85,17 @@ $batch->id; // persist this to check progress / cancel later
 Every job also carries Horizon tags — `queue-sql`, `queue-sql:{operation}`, and
 `queue-sql:{operation}:{table}` — so runs group and filter in the Horizon dashboard.
 
+## Monitoring (Artisan)
+
+```bash
+php artisan queue-sql:status            # list every queue-sql batch (id, name, progress)
+php artisan queue-sql:status {batch}    # one batch: total/pending/failed, progress %, state
+php artisan queue-sql:cancel {batch}    # cancel a running batch
+```
+
+Progress comes straight from Laravel's batch record — no extra tracking is stored. Grab a
+batch id from `->dispatch()` (`$batch->id`) or from the `queue-sql:status` list.
+
 ## Parameters (`queue(...)`)
 
 | Param | Meaning | Default |

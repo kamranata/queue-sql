@@ -19,6 +19,13 @@ class QueueSqlServiceProvider extends ServiceProvider
             __DIR__ . '/../config/queue-sql.php' => config_path('queue-sql.php'),
         ], 'queue-sql-config');
 
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \QueueSql\Console\StatusCommand::class,
+                \QueueSql\Console\CancelCommand::class,
+            ]);
+        }
+
         $macro = function (
             ?int $chunk = null,
             ?int $tries = null,

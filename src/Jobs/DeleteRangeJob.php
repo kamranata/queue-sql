@@ -11,7 +11,7 @@ use QueueSql\QuerySnapshot;
 
 class DeleteRangeJob implements ShouldQueue
 {
-    use Batchable, Dispatchable, InteractsWithQueue, Queueable;
+    use Batchable, Dispatchable, HasQueueSqlTags, InteractsWithQueue, Queueable;
 
     /** Retry attempts; a public property is how the queue worker reads tries. */
     public ?int $tries = null;
@@ -39,5 +39,10 @@ class DeleteRangeJob implements ShouldQueue
         }
 
         $query->delete();
+    }
+
+    public function tags(): array
+    {
+        return $this->queueSqlTags('delete', $this->snapshot->tableName());
     }
 }

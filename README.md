@@ -82,6 +82,9 @@ $batch = User::where('is_blocked', true)->queue(chunk: 5000)->delete()->dispatch
 $batch->id; // persist this to check progress / cancel later
 ```
 
+Every job also carries Horizon tags — `queue-sql`, `queue-sql:{operation}`, and
+`queue-sql:{operation}:{table}` — so runs group and filter in the Horizon dashboard.
+
 ## Parameters (`queue(...)`)
 
 | Param | Meaning | Default |

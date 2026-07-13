@@ -6,6 +6,8 @@ All notable changes to `queue-sql` are documented here. The format is based on
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-13
+
 ### Added
 - Config-driven defaults for **all** `queue(...)` params. `config/queue-sql.php` now also
   supplies `tries`, `backoff`, `throttle`, and `delay` (in addition to `chunk`, `connection`,
@@ -14,6 +16,10 @@ All notable changes to `queue-sql` are documented here. The format is based on
   `queue-sql:delete:users`) instead of the bare `queue-sql:delete`, so batches are
   distinguishable in `job_batches` / Horizon.
 - `dryRun()` now reports the resolved `table` alongside `operation`.
+
+### Changed
+- CI now also runs the full suite against real Postgres and MySQL (in addition to SQLite), so
+  engine-specific behavior (`MIN/MAX`, `whereBetween` boundaries, grammar) is covered.
 
 ## [1.0.0] - 2026-07-08
 
@@ -33,5 +39,6 @@ All notable changes to `queue-sql` are documented here. The format is based on
   no-dispatch plan preview.
 - Support for Laravel 10, 11, 12, and 13 on PHP 8.1+.
 
-[Unreleased]: https://github.com/kamranata/queue-sql/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/kamranata/queue-sql/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/kamranata/queue-sql/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/kamranata/queue-sql/releases/tag/v1.0.0

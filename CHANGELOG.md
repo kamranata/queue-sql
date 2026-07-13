@@ -6,6 +6,8 @@ All notable changes to `queue-sql` are documented here. The format is based on
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-07-13
+
 ### Added
 - Artisan commands: `queue-sql:status` (list all queue-sql batches, or show one by id with
   live progress) and `queue-sql:cancel {batch}` (cancel a running batch). Status surfaces
@@ -54,7 +56,8 @@ All notable changes to `queue-sql` are documented here. The format is based on
   no-dispatch plan preview.
 - Support for Laravel 10, 11, 12, and 13 on PHP 8.1+.
 
-[Unreleased]: https://github.com/kamranata/queue-sql/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/kamranata/queue-sql/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/kamranata/queue-sql/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/kamranata/queue-sql/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/kamranata/queue-sql/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/kamranata/queue-sql/releases/tag/v1.0.0

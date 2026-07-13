@@ -87,6 +87,7 @@ $batch->id; // persist this to check progress / cancel later
 | Param | Meaning | Default |
 |---|---|---|
 | `chunk` | rows per job | `1000` |
+| `maxJobs` | cap total jobs (auto-sizes `chunk`) — mutually exclusive with `chunk` | none |
 | `tries` | per-job retries | `1` |
 | `backoff` | seconds between retries | `0` |
 | `onConnection` | queue connection | default |
@@ -114,6 +115,27 @@ return [
 Note: because a `null` argument means "fall back to config", you cannot pass `throttle: null`
 at the call site to *disable* a throttle configured globally — set `throttle: 0`-style opt-outs
 are not supported for it. `delay: 0` does work as an explicit per-call override.
+
+`maxJobs` is opt-in and has **no** config default — it never competes with the configured
+`chunk`.
+
+### `maxJobs` — size by job count instead of chunk
+
+When you care about "how many jobs" rather than "how many rows per job", pass `maxJobs`. It
+auto-sizes the chunk so the fan-out produces at most that many jobs:
+
+```php
+// At most 50 jobs, whatever the table size:
+User::where('is_blocked', true)->queue(maxJobs: 50)->delete()->dispatch();
+
+// insert: at most 20 jobs across the row array
+DB::table('imports')->queue(maxJobs: 20)->insert($millionRows)->dispatch();
+```
+
+`chunk` and `maxJobs` are mutually exclusive — passing both throws `InvalidArgumentException`.
+For range fan-out (`delete`/`update`) the cap is derived from the **primary-key span**
+(`ceil(span / maxJobs)`), so with sparse keys individual jobs may cover uneven row counts; the
+job *count* is still bounded. `insert` derives it from the row count directly.
 
 ## Benchmark
 

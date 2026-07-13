@@ -91,7 +91,10 @@ class PendingQueuedQuery
             $tableName = $table;
         }
 
-        $parts = array_chunk($rows, max($this->config->chunk, 1));
+        $chunkSize = $this->config->maxJobs !== null
+            ? (int) max(1, (int) ceil(count($rows) / max($this->config->maxJobs, 1)))
+            : max($this->config->chunk, 1);
+        $parts = array_chunk($rows, $chunkSize);
 
         $tries = $this->config->tries;
         $backoff = $this->config->backoff;
@@ -117,6 +120,10 @@ class PendingQueuedQuery
             return [null]; // single job, no whereBetween
         }
 
-        return (new RangePlanner($this->builder, $key))->plan($this->config->chunk) ?: [];
+        $planner = new RangePlanner($this->builder, $key);
+
+        return ($this->config->maxJobs !== null
+            ? $planner->planForMaxJobs($this->config->maxJobs)
+            : $planner->plan($this->config->chunk)) ?: [];
     }
 }

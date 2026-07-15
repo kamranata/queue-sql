@@ -88,4 +88,48 @@ class ArtisanCommandsTest extends TestCase
         $this->artisan('queue-sql:cancel', ['batch' => 'nope'])
             ->assertFailed();
     }
+
+    public function test_status_json_lists_batches(): void
+    {
+        $this->seedUsers(4);
+        User::where('is_blocked', true)->queue(chunk: 2)->delete()->dispatch();
+
+        $this->artisan('queue-sql:status', ['--json' => true])
+            ->expectsOutputToContain('"name":"queue-sql:delete:users"')
+            ->assertSuccessful();
+    }
+
+    public function test_status_json_empty_is_array(): void
+    {
+        $this->artisan('queue-sql:status', ['--json' => true])
+            ->expectsOutputToContain('[]')
+            ->assertSuccessful();
+    }
+
+    public function test_status_json_detail(): void
+    {
+        $this->seedUsers(4);
+        $batch = User::where('is_blocked', true)->queue(chunk: 2)->delete()->dispatch();
+
+        $this->artisan('queue-sql:status', ['batch' => $batch->id, '--json' => true])
+            ->expectsOutputToContain('"progress":')
+            ->assertSuccessful();
+    }
+
+    public function test_status_json_detail_unknown_id_fails(): void
+    {
+        $this->artisan('queue-sql:status', ['batch' => 'nope', '--json' => true])
+            ->assertFailed();
+    }
+
+    public function test_status_watch_renders_once_when_not_interactive(): void
+    {
+        // A non-interactive stream (tests, pipes) must render once and exit — never loop.
+        $this->seedUsers(4);
+        User::where('is_blocked', true)->queue(chunk: 2)->delete()->dispatch();
+
+        $this->artisan('queue-sql:status', ['--watch' => true])
+            ->expectsOutputToContain('queue-sql:delete:users')
+            ->assertSuccessful();
+    }
 }

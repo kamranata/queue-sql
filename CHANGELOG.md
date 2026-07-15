@@ -6,6 +6,12 @@ All notable changes to `queue-sql` are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- `queue-sql:status --json` — machine-readable output (list or single batch) for piping into
+  external dashboards/monitoring.
+- `queue-sql:status --watch` — live-refreshing view (`--interval=N`, default 2s). Loops only on
+  a real TTY; a non-terminal stream (pipe, cron, tests) renders once and exits.
+
 ## [1.3.0] - 2026-07-13
 
 ### Added

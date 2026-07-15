@@ -6,6 +6,11 @@ All notable changes to `queue-sql` are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+- `upsert($values, $uniqueBy, $update)` terminal — fans out over the row array like `insert`,
+  but each chunk runs an idempotent `upsert`, so a retried job cannot duplicate rows. Respects
+  `chunk` / `maxJobs` and carries `queue-sql:upsert:{table}` batch names and Horizon tags.
+
 ## [1.3.0] - 2026-07-13
 
 ### Added

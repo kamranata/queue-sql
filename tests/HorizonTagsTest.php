@@ -5,6 +5,7 @@ namespace QueueSql\Tests;
 use QueueSql\Jobs\DeleteRangeJob;
 use QueueSql\Jobs\InsertChunkJob;
 use QueueSql\Jobs\UpdateRangeJob;
+use QueueSql\Jobs\UpsertChunkJob;
 use QueueSql\QuerySnapshot;
 use QueueSql\Tests\Support\User;
 
@@ -48,6 +49,16 @@ class HorizonTagsTest extends TestCase
 
         $this->assertSame(
             ['queue-sql', 'queue-sql:insert', 'queue-sql:insert:users'],
+            $job->tags()
+        );
+    }
+
+    public function test_upsert_job_tags(): void
+    {
+        $job = new UpsertChunkJob(null, 'testing', 'users', [['id' => 1]], ['id'], ['name']);
+
+        $this->assertSame(
+            ['queue-sql', 'queue-sql:upsert', 'queue-sql:upsert:users'],
             $job->tags()
         );
     }

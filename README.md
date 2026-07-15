@@ -110,10 +110,15 @@ Every job also carries Horizon tags — `queue-sql`, `queue-sql:{operation}`, an
 php artisan queue-sql:status            # list every queue-sql batch (id, name, progress)
 php artisan queue-sql:status {batch}    # one batch: total/pending/failed, progress %, state
 php artisan queue-sql:cancel {batch}    # cancel a running batch
+
+php artisan queue-sql:status --watch    # live-refreshing view (--interval=N, default 2s)
+php artisan queue-sql:status --json      # machine-readable JSON for external dashboards
 ```
 
 Progress comes straight from Laravel's batch record — no extra tracking is stored. Grab a
-batch id from `->dispatch()` (`$batch->id`) or from the `queue-sql:status` list.
+batch id from `->dispatch()` (`$batch->id`) or from the `queue-sql:status` list. `--json` works
+for both the list and a single batch; `--watch` refreshes only on a real terminal (piped or
+scheduled runs render once).
 
 ## Parameters (`queue(...)`)
 

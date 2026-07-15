@@ -7,6 +7,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use QueueSql\Jobs\DeleteRangeJob;
 use QueueSql\Jobs\InsertChunkJob;
 use QueueSql\Jobs\UpdateRangeJob;
+use QueueSql\Jobs\UpsertChunkJob;
 
 class PendingQueuedQuery
 {
@@ -77,33 +78,11 @@ class PendingQueuedQuery
 
     public function insert(array $rows): QueuedOperation
     {
-        $builder = $this->builder;
+        [$model, $connection, $table, $tableName] = $this->rowTarget();
 
-        if ($builder instanceof EloquentBuilder) {
-            $model = get_class($builder->getModel());
-            $connection = $builder->getModel()->getConnectionName();
-            $table = null;
-            $tableName = $builder->getModel()->getTable();
-        } else {
-            $model = null;
-            $connection = $builder->getConnection()->getName();
-            $table = $builder->from;
-            $tableName = $table;
-        }
-
-        $chunkSize = $this->config->maxJobs !== null
-            ? (int) max(1, (int) ceil(count($rows) / max($this->config->maxJobs, 1)))
-            : max($this->config->chunk, 1);
-        $parts = array_chunk($rows, $chunkSize);
-
-        $tries = $this->config->tries;
-        $backoff = $this->config->backoff;
-        $jobs = array_map(function (array $part) use ($model, $connection, $table, $tries, $backoff) {
-            $job = new InsertChunkJob($model, $connection, $table, $part);
-            $job->tries = $tries;
-            $job->backoff = $backoff;
-            return $job;
-        }, $parts);
+        $jobs = array_map(function (array $part) use ($model, $connection, $table) {
+            return $this->tune(new InsertChunkJob($model, $connection, $table, $part));
+        }, $this->chunkRows($rows));
 
         return new QueuedOperation(
             jobs: $jobs,
@@ -112,6 +91,60 @@ class PendingQueuedQuery
             countProbe: fn () => count($rows),
             table: $tableName,
         );
+    }
+
+    public function upsert(array $values, array|string $uniqueBy, ?array $update = null): QueuedOperation
+    {
+        [$model, $connection, $table, $tableName] = $this->rowTarget();
+
+        $jobs = array_map(function (array $part) use ($model, $connection, $table, $uniqueBy, $update) {
+            return $this->tune(new UpsertChunkJob($model, $connection, $table, $part, $uniqueBy, $update));
+        }, $this->chunkRows($values));
+
+        return new QueuedOperation(
+            jobs: $jobs,
+            config: $this->config,
+            operation: 'upsert',
+            countProbe: fn () => count($values),
+            table: $tableName,
+        );
+    }
+
+    /**
+     * Resolve the fan-out target for row-array terminals (insert/upsert).
+     *
+     * @return array{0: ?string, 1: ?string, 2: ?string, 3: ?string} [model, connection, table, tableName]
+     */
+    private function rowTarget(): array
+    {
+        $builder = $this->builder;
+
+        if ($builder instanceof EloquentBuilder) {
+            $model = get_class($builder->getModel());
+
+            return [$model, $builder->getModel()->getConnectionName(), null, $builder->getModel()->getTable()];
+        }
+
+        return [null, $builder->getConnection()->getName(), $builder->from, $builder->from];
+    }
+
+    /** Split a row array into chunks sized by chunk, or by maxJobs when set. */
+    private function chunkRows(array $rows): array
+    {
+        $chunkSize = $this->config->maxJobs !== null
+            ? (int) max(1, (int) ceil(count($rows) / max($this->config->maxJobs, 1)))
+            : max($this->config->chunk, 1);
+
+        return array_chunk($rows, $chunkSize);
+    }
+
+    /** Apply the shared per-job retry settings. */
+    private function tune(object $job): object
+    {
+        $job->tries = $this->config->tries;
+        $job->backoff = $this->config->backoff;
+
+        return $job;
     }
 
     private function buildRanges(QuerySnapshot $snapshot, string $key): array

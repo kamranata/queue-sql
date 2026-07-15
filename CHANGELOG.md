@@ -7,6 +7,9 @@ All notable changes to `queue-sql` are documented here. The format is based on
 ## [Unreleased]
 
 ### Added
+- `upsert($values, $uniqueBy, $update)` terminal — fans out over the row array like `insert`,
+  but each chunk runs an idempotent `upsert`, so a retried job cannot duplicate rows. Respects
+  `chunk` / `maxJobs` and carries `queue-sql:upsert:{table}` batch names and Horizon tags.
 - `queue-sql:status --json` — machine-readable output (list or single batch) for piping into
   external dashboards/monitoring.
 - `queue-sql:status --watch` — live-refreshing view (`--interval=N`, default 2s). Loops only on

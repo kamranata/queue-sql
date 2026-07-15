@@ -27,7 +27,7 @@ You keep the fluent Eloquent API you already know, and get batch progress, retri
 
 ## Features
 
-- **Any write, any builder** — `delete` / `update` / `insert` on the Query Builder or Eloquent.
+- **Any write, any builder** — `delete` / `update` / `insert` / `upsert` on the Query Builder or Eloquent.
 - **Parallel PK-range fan-out** — one batched job per key range; short locks instead of one long one.
 - **Every `where` survives the queue boundary** — nested closures, `whereHas`, `whereExists`,
   sub-selects — captured as a parameterized SQL fragment (injection-safe, no serialized closures).
@@ -84,6 +84,12 @@ User::where('last_login', '<', now()->subYear())
 
 // Insert (fans out over the row array):
 DB::table('imports')->queue(chunk: 1000)->insert($millionRows)->dispatch();
+
+// Upsert (idempotent — safe to retry; insert new, update existing on conflict):
+DB::table('stats')
+    ->queue(chunk: 1000)
+    ->upsert($rows, uniqueBy: ['user_id', 'day'], update: ['views'])
+    ->dispatch();
 ```
 
 Each dispatch returns Laravel's `Illuminate\Bus\Batch`, and its batch is named
@@ -191,7 +197,7 @@ contention the gap is far larger — point the script at your database with
   single job (still queued). All `where` types (including nested closures, `whereHas`,
   `whereExists`, sub-selects) are supported.
 - **`insert` is not idempotent** — a retry can duplicate rows. Guard with unique
-  indexes / `insertOrIgnore` at the DB level.
+  indexes / `insertOrIgnore` at the DB level, or use `upsert` (which is retry-safe).
 - **Throttle/delay staggering relies on the queue driver honoring per-job delay** —
   the database and redis drivers do; SQS caps delay at 15 minutes.
 - **Fan-out plans the primary-key range at dispatch time** — rows inserted afterward
